@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Recipe Findr</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+
+<!-- Login Modal -->
+<div id="login-modal" class="modal">
+    <div class="modal-content">
+        <span class="close" id="close-login">&times;</span>
+        <h2>Login</h2>
+        <form id="login-form">
+            <input type="email" id="login-email" placeholder="Email" required>
+            <input type="password" id="login-password" placeholder="Password" required>
+            <button type="submit">Login</button>
+        </form>
+    </div>
+</div>
+
+<!-- Signup Modal -->
+<div id="signup-modal" class="modal">
+    <div class="modal-content">
+        <span class="close" id="close-signup">&times;</span>
+        <h2>Signup</h2>
+        <form id="signup-form">
+            <input type="email" id="signup-email" placeholder="Email" required>
+            <input type="password" id="signup-password" placeholder="Password" required>
+            <button type="submit">Signup</button>
+        </form>
+    </div>
+</div>
+
+<body>
+    <header>
+        <div class="logo-container">
+            <img src="assets/logo.png" alt="Culinary Companion Logo" class="logo">
+            <h1>Culinary Companion</h1>
+        </div>
+        <div class="auth-container">
+            <a href="#" id="login">Login</a>
+            <a href="#" id="signup">Signup</a>
+        </div>
+    </header>
+
+    <section id="search-section">
+        <h2>Enter Your Main Ingredients</h2>
+        <div class="input-container">
+            <input type="text" id="ingredient1" placeholder="Ingredient 1">
+            <input type="text" id="ingredient2" placeholder="Ingredient 2">
+            <input type="text" id="ingredient3" placeholder="Ingredient 3">
+            <button onclick="searchRecipes()">Search</button>
+        </div>
+    </section>
+
+    <section id="results-section">
+        <h2>Recipe Suggestions</h2>
+        <div id="recipes"></div>
+    </section>
+
+    <footer>
+        <p>Something Here</p>
+    </footer>
+
+    <script src="app.js"></script>
+</body>
+</html>
