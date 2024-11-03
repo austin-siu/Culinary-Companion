@@ -1,4 +1,4 @@
-const apiKey = 'eb23580ee2d64d6bad96c8e88c21646f';
+const apiKey = '954d97b6472e4b95be3147cf5aee48b0';
 
 // Get the modals
 const loginModal = document.getElementById('login-modal');
@@ -7,6 +7,10 @@ const signupModal = document.getElementById('signup-modal');
 // Get the buttons that open the modals
 const loginBtn = document.getElementById('login');
 const signupBtn = document.getElementById('signup');
+const loginFormBtn = document.getElementById('login-form-btn');
+const signupFormBtn = document.getElementById('signup-form-btn');
+
+let isLoggedIn = false; // Tracks if a user is logged in
 
 // Get the close buttons
 const closeLogin = document.getElementById('close-login');
@@ -41,6 +45,48 @@ window.onclick = function(event) {
     }
 }
 
+// Login functionality
+loginFormBtn.onclick = function(event) {
+    event.preventDefault(); // Prevent form submission
+
+    const email = document.getElementById('login-email').value;
+    const password = document.getElementById('login-password').value;
+
+    const users = JSON.parse(localStorage.getItem('users')) || [];
+
+    // Check if user exists
+    const user = users.find(user => user.signupEmail === email && user.signupPassword === password);
+    if (user) {
+        alert(`${email} is successfully logged in`);
+        loginModal.style.display = 'none';
+        isLoggedIn = true;
+        document.getElementById('loggedInAs').innerText = `Logged in as: ${email}`;
+    } else {
+        alert('Invalid credentials');
+    }
+}
+
+// Signup functionality
+signupFormBtn.onclick = function(event) {
+    event.preventDefault(); // Prevent form submission
+
+    const signupEmail = document.getElementById('signup-email').value;
+    const signupPassword = document.getElementById('signup-password').value;
+
+    const users = JSON.parse(localStorage.getItem('users')) || [];
+
+    // Check if user already exists
+    if (users.some(user => user.signupEmail === signupEmail)) {
+        alert("User already exists");
+    } else {
+        // Save new user
+        users.push({ signupEmail, signupPassword });
+        localStorage.setItem('users', JSON.stringify(users));
+        alert("User has been successfully registered!");
+    }
+}
+
+// Recipe search and display functions
 async function searchRecipes() {
     const ingredient1 = document.getElementById('ingredient1').value;
     const ingredient2 = document.getElementById('ingredient2').value;
@@ -62,7 +108,6 @@ function displayRecipes(recipes) {
         const recipeDiv = document.createElement('div');
         recipeDiv.classList.add('recipe');
 
-        // Link to recipe.html with recipe ID as a query parameter
         const recipeContent = `
             <a href="recipe.html?id=${recipe.id}" class="recipe-link">
                 <h3>${recipe.title}</h3>
@@ -75,27 +120,23 @@ function displayRecipes(recipes) {
         recipeContainer.appendChild(recipeDiv);
     });
 }
+
+// Fetch and display detailed recipe information on the recipe page
 async function fetchRecipeDetails() {
     try {
-        // Retrieve the recipe ID from the URL parameters
         const urlParams = new URLSearchParams(window.location.search);
         const recipeId = urlParams.get('id');
-        console.log("Recipe ID:", recipeId); // Debugging output
 
-        // Check if recipeId is null or empty
         if (!recipeId) {
             console.error("No recipe ID found in URL");
             return;
         }
 
-        // Fetch recipe details from the API
         const response = await fetch(`https://api.spoonacular.com/recipes/${recipeId}/information?includeNutrition=true&apiKey=${apiKey}`);
-        console.log("API Response:", response); // Debugging output
 
         if (response.ok) {
             const recipe = await response.json();
-            console.log("Recipe Data:", recipe); // Debugging output
-            displayRecipeDetails(recipe); // Display recipe details on the page
+            displayRecipeDetails(recipe);
         } else {
             console.error("Failed to fetch recipe data:", response.status);
             document.getElementById('recipe-details').innerHTML = `<p>Error: Unable to load recipe details (status: ${response.status})</p>`;
@@ -114,7 +155,6 @@ function displayRecipeDetails(recipe) {
         return;
     }
 
-    // Populate the HTML with the recipe details
     recipeDetailsSection.innerHTML = `
         <h2>${recipe.title}</h2>
         <img src="${recipe.image}" alt="${recipe.title}">
@@ -133,6 +173,3 @@ function displayRecipeDetails(recipe) {
 document.addEventListener("DOMContentLoaded", function() {
     fetchRecipeDetails();
 });
-
-
-

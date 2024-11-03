@@ -37,7 +37,7 @@
         });
 
        async function fetchRecipeDetails() {
-	   const apiKey = 'eb23580ee2d64d6bad96c8e88c21646f';
+	   const apiKey = '954d97b6472e4b95be3147cf5aee48b0';
     try {
         // Retrieve the recipe ID from the URL parameters
         const urlParams = new URLSearchParams(window.location.search);
@@ -91,7 +91,8 @@ function displayRecipeDetails(recipe) {
         <p><strong>Weight Watcher Points:</strong> ${recipe.weightWatcherSmartPoints}</p>
         <p><strong>Aggregate Likes:</strong> ${recipe.aggregateLikes}</p>
         <p><strong>Source:</strong> <a href="${recipe.sourceUrl}" target="_blank">${recipe.sourceName || 'Recipe Source'}</a></p>
-        <h3>Dietary Information</h3>
+        
+		<h3>Dietary Information</h3>
         <ul>
             <li>Vegetarian: ${recipe.vegetarian ? 'Yes' : 'No'}</li>
             <li>Vegan: ${recipe.vegan ? 'Yes' : 'No'}</li>
