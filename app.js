@@ -41,6 +41,7 @@ window.onclick = function(event) {
     }
 }
 
+// Function to search for recipes based on ingredients
 async function searchRecipes() {
     const ingredient1 = document.getElementById('ingredient1').value;
     const ingredient2 = document.getElementById('ingredient2').value;
@@ -48,12 +49,30 @@ async function searchRecipes() {
 
     const ingredients = `${ingredient1},${ingredient2},${ingredient3}`;
 
-    const response = await fetch(`https://api.spoonacular.com/recipes/findByIngredients?ingredients=${ingredients}&number=5&apiKey=${apiKey}`);
-    const recipes = await response.json();
+    try {
+        // First API call to get recipes by ingredients
+        const response = await fetch(`https://api.spoonacular.com/recipes/findByIngredients?ingredients=${ingredients}&number=5&apiKey=${apiKey}`);
+        const recipes = await response.json();
 
-    displayRecipes(recipes);
+        // Make a second API call to get detailed information for each recipe
+        const recipesWithDetails = await Promise.all(recipes.map(async (recipe) => {
+            const detailsResponse = await fetch(`https://api.spoonacular.com/recipes/${recipe.id}/information?apiKey=${apiKey}`);
+            const details = await detailsResponse.json();
+            return {
+                ...recipe,                   // Keep existing recipe data
+                sourceUrl: details.sourceUrl // Add sourceUrl from detailed response
+            };
+        }));
+
+        // Display recipes with the sourceUrl included
+        displayRecipes(recipesWithDetails);
+    } catch (error) {
+        console.error("Error fetching recipes:", error);
+        alert("An error occurred while fetching recipes. Please try again.");
+    }
 }
 
+// Function to display recipes in the UI
 function displayRecipes(recipes) {
     const recipeContainer = document.getElementById('recipes');
     recipeContainer.innerHTML = ''; // Clear previous results
@@ -74,4 +93,3 @@ function displayRecipes(recipes) {
         recipeContainer.appendChild(recipeDiv);
     });
 }
-
