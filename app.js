@@ -41,7 +41,6 @@ window.onclick = function(event) {
     }
 }
 
-// Function to search for recipes based on ingredients
 async function searchRecipes() {
     const ingredient1 = document.getElementById('ingredient1').value;
     const ingredient2 = document.getElementById('ingredient2').value;
@@ -49,30 +48,12 @@ async function searchRecipes() {
 
     const ingredients = `${ingredient1},${ingredient2},${ingredient3}`;
 
-    try {
-        // First API call to get recipes by ingredients
-        const response = await fetch(`https://api.spoonacular.com/recipes/findByIngredients?ingredients=${ingredients}&number=5&apiKey=${apiKey}`);
-        const recipes = await response.json();
+    const response = await fetch(`https://api.spoonacular.com/recipes/findByIngredients?ingredients=${ingredients}&number=5&apiKey=${apiKey}`);
+    const recipes = await response.json();
 
-        // Make a second API call to get detailed information for each recipe
-        const recipesWithDetails = await Promise.all(recipes.map(async (recipe) => {
-            const detailsResponse = await fetch(`https://api.spoonacular.com/recipes/${recipe.id}/information?apiKey=${apiKey}`);
-            const details = await detailsResponse.json();
-            return {
-                ...recipe,                   // Keep existing recipe data
-                sourceUrl: details.sourceUrl // Add sourceUrl from detailed response
-            };
-        }));
-
-        // Display recipes with the sourceUrl included
-        displayRecipes(recipesWithDetails);
-    } catch (error) {
-        console.error("Error fetching recipes:", error);
-        alert("An error occurred while fetching recipes. Please try again.");
-    }
+    displayRecipes(recipes);
 }
 
-// Function to display recipes in the UI
 function displayRecipes(recipes) {
     const recipeContainer = document.getElementById('recipes');
     recipeContainer.innerHTML = ''; // Clear previous results
@@ -81,9 +62,10 @@ function displayRecipes(recipes) {
         const recipeDiv = document.createElement('div');
         recipeDiv.classList.add('recipe');
 
+        // Link to recipe.html with recipe ID as a query parameter
         const recipeContent = `
-            <a href="${recipe.sourceUrl}" target="_blank" class="recipe-link">
-                <h3>${recipe.title}</h3>    
+            <a href="recipe.html?id=${recipe.id}" class="recipe-link">
+                <h3>${recipe.title}</h3>
                 <img src="${recipe.image}" alt="${recipe.title}">
                 <p>${recipe.description || ''}</p>
             </a>
@@ -93,3 +75,64 @@ function displayRecipes(recipes) {
         recipeContainer.appendChild(recipeDiv);
     });
 }
+async function fetchRecipeDetails() {
+    try {
+        // Retrieve the recipe ID from the URL parameters
+        const urlParams = new URLSearchParams(window.location.search);
+        const recipeId = urlParams.get('id');
+        console.log("Recipe ID:", recipeId); // Debugging output
+
+        // Check if recipeId is null or empty
+        if (!recipeId) {
+            console.error("No recipe ID found in URL");
+            return;
+        }
+
+        // Fetch recipe details from the API
+        const response = await fetch(`https://api.spoonacular.com/recipes/${recipeId}/information?includeNutrition=true&apiKey=${apiKey}`);
+        console.log("API Response:", response); // Debugging output
+
+        if (response.ok) {
+            const recipe = await response.json();
+            console.log("Recipe Data:", recipe); // Debugging output
+            displayRecipeDetails(recipe); // Display recipe details on the page
+        } else {
+            console.error("Failed to fetch recipe data:", response.status);
+            document.getElementById('recipe-details').innerHTML = `<p>Error: Unable to load recipe details (status: ${response.status})</p>`;
+        }
+    } catch (error) {
+        console.error("Error fetching recipe:", error);
+        document.getElementById('recipe-details').innerHTML = `<p>Error: Unable to load recipe details. Please try again later.</p>`;
+    }
+}
+
+function displayRecipeDetails(recipe) {
+    const recipeDetailsSection = document.getElementById('recipe-details');
+
+    if (!recipeDetailsSection) {
+        console.error("Recipe details section not found in HTML");
+        return;
+    }
+
+    // Populate the HTML with the recipe details
+    recipeDetailsSection.innerHTML = `
+        <h2>${recipe.title}</h2>
+        <img src="${recipe.image}" alt="${recipe.title}">
+        <p><strong>Servings:</strong> ${recipe.servings}</p>
+        <p><strong>Preparation time:</strong> ${recipe.readyInMinutes} minutes</p>
+        <h3>Ingredients</h3>
+        <ul>
+            ${recipe.extendedIngredients.map(ingredient => `<li>${ingredient.original}</li>`).join('')}
+        </ul>
+        <h3>Instructions</h3>
+        <p>${recipe.instructions || "No instructions available"}</p>
+    `;
+}
+
+// Call the function to fetch and display the recipe details after the DOM has loaded
+document.addEventListener("DOMContentLoaded", function() {
+    fetchRecipeDetails();
+});
+
+
+

@@ -19,7 +19,9 @@ header {
     display: flex;
     align-items: center;
 }
-
+#recipe-details {
+    padding: 20px; /* Adjust the value as needed */
+}
 .logo-container h1 {
     margin-left: 10px;
     font-size: 24px;
@@ -158,10 +160,30 @@ header {
     width: 300px;
     background-color: #fff;
 }
+.recipe-image {
+    width: 100%; /* Make the image take up the full width */
+    height: 60%; /* Maintain the aspect ratio */
+    display: block; /* Remove any inline spacing */
+}
 
 .recipe-link {
     text-decoration: none;
     color: inherit;
+}
+
+
+.footer-text {
+    display: inline; /* Keep everything inline */
+    font-size: 14px; /* Adjust font size as needed */
+}
+
+.footer-text a {
+    text-decoration: none; /* Remove underline from links */
+    color: #007bff; /* Set link color */
+}
+
+.footer-text a:hover {
+    text-decoration: underline; /* Add underline on hover */
 }
 
 
@@ -176,5 +198,10 @@ footer {
     z-index: 1000;         /* Make sure the footer stays on top */
 }
 
+h3 {
+    background-color: #e0f7fa; /* Very light cyan */
+    padding: 6px;
+    border-radius: 5px;
+}
 
 

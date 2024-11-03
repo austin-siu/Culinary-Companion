@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Recipe Details</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <header>
+        <div class="logo-container">
+            <img src="assets/logo.png" alt="Culinary Companion Logo" class="logo">
+            <h1>Recipe Details</h1>
+        </div>
+    </header>
+
+    <section id="recipe-details">
+        <!-- Recipe details will be dynamically inserted here -->
+    </section>
+
+   <footer>
+    <p class="footer-text">&copy; 2024 Culinary Companion. All rights reserved. | 
+        <a href="#about">About Us</a> | 
+        <a href="#contact">Contact</a> | 
+        <a href="#privacy">Privacy Policy</a> | 
+        <a href="#terms">Terms of Service</a> | 
+        Follow us on 
+        <a href="https://twitter.com/yourprofile" target="_blank">Twitter</a>, 
+        <a href="https://facebook.com/yourprofile" target="_blank">Facebook</a>, 
+        <a href="https://instagram.com/yourprofile" target="_blank">Instagram</a>
+    </p>
+</footer>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            fetchRecipeDetails();
+        });
+
+       async function fetchRecipeDetails() {
+	   const apiKey = 'eb23580ee2d64d6bad96c8e88c21646f';
+    try {
+        // Retrieve the recipe ID from the URL parameters
+        const urlParams = new URLSearchParams(window.location.search);
+        const recipeId = urlParams.get('id');
+        console.log("Recipe ID:", recipeId); // Debugging output
+
+        // Check if recipeId is null or empty
+        if (!recipeId) {
+            console.error("No recipe ID found in URL");
+            return;
+        }
+
+        // Fetch recipe details from the API
+        const response = await fetch(`https://api.spoonacular.com/recipes/${recipeId}/information?includeNutrition=true&apiKey=${apiKey}`);
+        console.log("API Response:", response); // Debugging output
+
+        if (response.ok) {
+            const recipe = await response.json();
+            console.log("Recipe Data:", recipe); // Debugging output
+            displayRecipeDetails(recipe); // Display recipe details on the page
+        } else {
+            console.error("Failed to fetch recipe data:", response.status);
+            document.getElementById('recipe-details').innerHTML = `<p>Error: Unable to load recipe details (status: ${response.status})</p>`;
+        }
+    } catch (error) {
+        console.error("Error fetching recipe:", error);
+        document.getElementById('recipe-details').innerHTML = `<p>Error: Unable to load recipe details. Please try again later.</p>`;
+    }
+}
+
+function displayRecipeDetails(recipe) {
+    const recipeDetailsSection = document.getElementById('recipe-details');
+
+    if (!recipeDetailsSection) {
+        console.error("Recipe details section not found in HTML");
+        return;
+    }
+
+    // Populate the HTML with the recipe details
+    recipeDetailsSection.innerHTML = `
+        <h2>${recipe.title}</h2>
+        <img src="${recipe.image}" alt="${recipe.title}" class="recipe-image">
+
+		
+		
+		
+        <p><strong>Servings:</strong> ${recipe.servings}</p>
+        <p><strong>Preparation time:</strong> ${recipe.readyInMinutes} minutes</p>
+        <p><strong>Price per Serving:</strong> $${(recipe.pricePerServing / 100).toFixed(2)}</p>
+        <p><strong>Health Score:</strong> ${recipe.healthScore}</p>
+        <p><strong>Weight Watcher Points:</strong> ${recipe.weightWatcherSmartPoints}</p>
+        <p><strong>Aggregate Likes:</strong> ${recipe.aggregateLikes}</p>
+        <p><strong>Source:</strong> <a href="${recipe.sourceUrl}" target="_blank">${recipe.sourceName || 'Recipe Source'}</a></p>
+        <h3>Dietary Information</h3>
+        <ul>
+            <li>Vegetarian: ${recipe.vegetarian ? 'Yes' : 'No'}</li>
+            <li>Vegan: ${recipe.vegan ? 'Yes' : 'No'}</li>
+            <li>Gluten-Free: ${recipe.glutenFree ? 'Yes' : 'No'}</li>
+            <li>Dairy-Free: ${recipe.dairyFree ? 'Yes' : 'No'}</li>
+            <li>Very Healthy: ${recipe.veryHealthy ? 'Yes' : 'No'}</li>
+            <li>Cheap: ${recipe.cheap ? 'Yes' : 'No'}</li>
+            <li>Popular: ${recipe.veryPopular ? 'Yes' : 'No'}</li>
+            <li>Sustainable: ${recipe.sustainable ? 'Yes' : 'No'}</li>
+        </ul>
+        <h3>Ingredients</h3>
+        <ul>
+            ${recipe.extendedIngredients.map(ingredient => `<li>${ingredient.original}</li>`).join('')}
+        </ul>
+        <h3>Instructions</h3>
+        <p>${recipe.instructions || "No instructions available"}</p>
+        <h3>Nutrition Information</h3>
+        <ul>
+            ${recipe.nutrition.nutrients.map(nutrient => `
+                <li>${nutrient.name}: ${nutrient.amount}${nutrient.unit} (${nutrient.percentOfDailyNeeds}% of daily needs)</li>
+            `).join('')}
+        </ul>
+        <h3>Flavonoids</h3>
+        <ul>
+            ${recipe.nutrition.flavonoids.map(flavonoid => `
+                <li>${flavonoid.name}: ${flavonoid.amount}${flavonoid.unit}</li>
+            `).join('')}
+        </ul>
+	
+    `;
+	 // Displaying steps with ingredients and equipment
+if (recipe.analyzedInstructions && recipe.analyzedInstructions.length > 0) {
+    recipeDetailsSection.innerHTML += `<h3>Detailed Instructions</h3>`;
+
+    recipe.analyzedInstructions.forEach(instruction => {
+        instruction.steps.forEach(step => {
+            const ingredientsHTML = step.ingredients.map(ingredient => `
+                <li>
+                    ${ingredient.name}
+                    ${ingredient.image ? `<div><img src="https://spoonacular.com/cdn/ingredients_100x100/${ingredient.image}" alt="${ingredient.name}" style="width: 50px; height: 50px;"></div>` : ''}
+                </li>
+            `).join('');
+
+            const equipmentHTML = step.equipment.map(equipment => `
+                <li>
+                    ${equipment.name}
+                    ${equipment.image ? `<div><img src="${equipment.image}" alt="${equipment.name}" style="width: 50px; height: 50px;"></div>` : ''}
+                </li>
+            `).join('');
+
+            recipeDetailsSection.innerHTML += `
+                <h4>Step ${step.number}</h4>
+                <p>${step.step}</p>
+                
+                <h5>Ingredients:</h5>
+                <ul>${ingredientsHTML}</ul>
+                
+                <h5>Equipment:</h5>
+                <ul>${equipmentHTML}</ul>
+            `;
+        });
+    });
+} else {
+    recipeDetailsSection.innerHTML += `<p>No instructions available.</p>`;
+}
+
+	
+	
+	
+}
+
+
+    </script>
+	
+</body>
+</html>
