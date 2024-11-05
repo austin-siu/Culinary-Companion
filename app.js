@@ -10,6 +10,8 @@ const signupBtn = document.getElementById('signup');
 const loginFormBtn = document.getElementById('login-form-btn');
 const signupFormBtn = document.getElementById('signup-form-btn');
 
+//This is a Upload Test from Dave
+
 let isLoggedIn = false; // Tracks if a user is logged in
 
 // Get the close buttons
