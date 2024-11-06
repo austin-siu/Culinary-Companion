@@ -1,4 +1,4 @@
-const apiKey = '954d97b6472e4b95be3147cf5aee48b0';
+const apiKey = 'eb23580ee2d64d6bad96c8e88c21646f';
 
 // Get the modals
 const loginModal = document.getElementById('login-modal');
