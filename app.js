@@ -114,25 +114,48 @@ async function populateCuisineDropdown() {
 
 // Recipe search and display functions
 async function searchRecipes() {
-    const ingredient1 = document.getElementById('ingredient1').value;
-    const ingredient2 = document.getElementById('ingredient2').value;
-    const ingredient3 = document.getElementById('ingredient3').value;
-    const selectedCuisine = document.getElementById('cuisine').value; // Get selected cuisine
+    const ingredient1 = document.getElementById('ingredient1').value.trim();
+    const ingredient2 = document.getElementById('ingredient2').value.trim();
+    const ingredient3 = document.getElementById('ingredient3').value.trim();
+    const selectedCuisine = document.getElementById('cuisine').value.trim();
 
-    const ingredients = `${ingredient1},${ingredient2},${ingredient3}`;
+    // Create a cleaned list of non-empty ingredients
+    const ingredients = [ingredient1, ingredient2, ingredient3].filter(Boolean).join(',');
 
-    let apiUrl = `https://api.spoonacular.com/recipes/findByIngredients?ingredients=${ingredients}&number=20&apiKey=${apiKey}`;
+    let apiUrl;
 
-    // Build the API request URL with cuisine parameter if selected, add the cuisine filter if selected
-    if (selectedCuisine) {
+    // Use complexSearch if a cuisine is selected; otherwise, use findByIngredients
+    if (selectedCuisine && selectedCuisine !== "Select Cuisine") {
         apiUrl = `https://api.spoonacular.com/recipes/complexSearch?includeIngredients=${ingredients}&cuisine=${selectedCuisine}&number=20&apiKey=${apiKey}`;
+    } else {
+        apiUrl = `https://api.spoonacular.com/recipes/findByIngredients?ingredients=${ingredients}&number=20&apiKey=${apiKey}`;
     }
 
-    const response = await fetch(apiUrl);
-    const recipes = await response.json();
+    try {
+        // Log the API URL to inspect
+        console.log("API URL:", apiUrl);
 
-    displayRecipes(recipes);
+        const response = await fetch(apiUrl);
+        const data = await response.json();
+
+        // Check if the API response contains `results` (for complexSearch) or is a direct array (for findByIngredients)
+        const recipes = data.results || data;
+
+        // Log the data to inspect the structure and see if there are any error messages
+        console.log("API Response Data:", data);
+
+        // Display recipes or show an error if no valid recipes are returned
+        if (recipes && recipes.length > 0) {
+            displayRecipes(recipes);
+        } else {
+            document.getElementById('recipes').innerHTML = "<p>No recipes found for the selected criteria.</p>";
+        }
+    } catch (error) {
+        console.error("Error fetching recipes:", error);
+        document.getElementById('recipes').innerHTML = `<p>Error: Unable to load recipes. Please try again later.</p>`;
+    }
 }
+
 
 // Pagination variable support
 let currentPage = 1;
