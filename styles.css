@@ -143,6 +143,17 @@ header {
     background-color: #006600; /* Darken button color on hover */
 }
 
+#search-section #cuisine {
+    width: 80%;                /* Match width with input fields */
+    padding: 15px;             /* Same padding for a consistent look */
+    margin: 10px 0;            /* Margin to add spacing between elements */
+    font-size: 16px;           /* Same font size as inputs */
+    border-radius: 5px;        /* Rounded corners for consistency */
+    border: 1px solid #ccc;  /* Border to match input fields */
+    background-color: white; /* Background color for a clean look */
+    appearance: none;          /* Remove default arrow styles on some browsers */
+}
+
 #results-section {
     margin: 50px;
 }
@@ -169,6 +180,20 @@ header {
 .recipe-link {
     text-decoration: none;
     color: inherit;
+}
+
+#pagination button {
+    padding: 10px 20px;
+    margin: 5px;
+    background-color: #004d00;
+    color: white;
+    border: none;
+    cursor: pointer;
+    border-radius: 5px;
+}
+
+#pagination button:hover {
+    background-color: #006600;
 }
 
 

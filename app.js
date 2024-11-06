@@ -86,25 +86,70 @@ signupFormBtn.onclick = function(event) {
     }
 }
 
+// Fetch available cuisines and populate dropdown
+async function populateCuisineDropdown() {
+    const cuisineDropdown = document.getElementById('cuisine');
+
+    if (!cuisineDropdown) {
+        console.error("Cuisine dropdown element not found!");
+        return;
+    }
+
+    // Cuisines offered by Spoonacular API
+    const cuisines = [
+        "African", "American", "British", "Cajun", "Caribbean", "Chinese", "Eastern European",
+        "European", "French", "German", "Greek", "Indian", "Irish", "Italian", "Japanese",
+        "Jewish", "Korean", "Latin American", "Mediterranean", "Mexican", "Middle Eastern",
+        "Nordic", "Southern", "Spanish", "Thai", "Vietnamese"
+    ];
+
+    cuisines.forEach(cuisine => {
+        const option = document.createElement("option");
+        option.value = cuisine;
+        option.textContent = cuisine;
+        cuisineDropdown.appendChild(option);
+    });
+}
+
+
 // Recipe search and display functions
 async function searchRecipes() {
     const ingredient1 = document.getElementById('ingredient1').value;
     const ingredient2 = document.getElementById('ingredient2').value;
     const ingredient3 = document.getElementById('ingredient3').value;
+    const selectedCuisine = document.getElementById('cuisine').value; // Get selected cuisine
 
     const ingredients = `${ingredient1},${ingredient2},${ingredient3}`;
 
-    const response = await fetch(`https://api.spoonacular.com/recipes/findByIngredients?ingredients=${ingredients}&number=5&apiKey=${apiKey}`);
+    // Build the API request URL with cuisine parameter if selected
+    let apiUrl = `https://api.spoonacular.com/recipes/complexSearch?ingredients=${ingredients}&number=20&apiKey=${apiKey}`;
+    if (selectedCuisine) {
+        apiUrl += `&cuisine=${selectedCuisine}`;
+    }
+
+    const response = await fetch(apiUrl);
     const recipes = await response.json();
 
-    displayRecipes(recipes);
+    displayRecipes(recipes.results); // Adjust as per API response format
 }
 
+// Pagination variable support
+let currentPage = 1;
+const recipesPerPage = 4;
+let allRecipes = [];
+
+// Display only the recipes for the current page
 function displayRecipes(recipes) {
+    allRecipes = recipes; // Store all recipes in a global variable
     const recipeContainer = document.getElementById('recipes');
     recipeContainer.innerHTML = ''; // Clear previous results
 
-    recipes.forEach(recipe => {
+    // Calculate the recipes to display for the current page
+    const startIndex = (currentPage - 1) * recipesPerPage;
+    const endIndex = startIndex + recipesPerPage;
+    const recipesToDisplay = allRecipes.slice(startIndex, endIndex);
+
+    recipesToDisplay.forEach(recipe => {
         const recipeDiv = document.createElement('div');
         recipeDiv.classList.add('recipe');
 
@@ -119,7 +164,39 @@ function displayRecipes(recipes) {
         recipeDiv.innerHTML = recipeContent;
         recipeContainer.appendChild(recipeDiv);
     });
+
+    // Display navigation buttons if there are more than one page of results
+    displayPaginationControls();
 }
+
+// Show pagination controls
+function displayPaginationControls() {
+    const paginationContainer = document.getElementById('pagination');
+    paginationContainer.innerHTML = ''; // Clear previous buttons
+
+    // Previous button
+    if (currentPage > 1) {
+        const prevButton = document.createElement('button');
+        prevButton.textContent = 'Previous';
+        prevButton.onclick = () => {
+            currentPage--;
+            displayRecipes(allRecipes);
+        };
+        paginationContainer.appendChild(prevButton);
+    }
+
+    // Next button
+    if (currentPage * recipesPerPage < allRecipes.length) {
+        const nextButton = document.createElement('button');
+        nextButton.textContent = 'Next';
+        nextButton.onclick = () => {
+            currentPage++;
+            displayRecipes(allRecipes);
+        };
+        paginationContainer.appendChild(nextButton);
+    }
+}
+
 
 // Fetch and display detailed recipe information on the recipe page
 async function fetchRecipeDetails() {
@@ -169,7 +246,8 @@ function displayRecipeDetails(recipe) {
     `;
 }
 
-// Call the function to fetch and display the recipe details after the DOM has loaded
+// Call the functions to fetch recipe details and populate the cuisine dropdown after the DOM has loaded
 document.addEventListener("DOMContentLoaded", function() {
     fetchRecipeDetails();
+    populateCuisineDropdown();
 });

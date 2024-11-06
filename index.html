@@ -52,6 +52,13 @@
             <input type="text" id="ingredient1" placeholder="Ingredient 1">
             <input type="text" id="ingredient2" placeholder="Ingredient 2">
             <input type="text" id="ingredient3" placeholder="Ingredient 3">
+
+            <!-- Cuisine Dropdown -->
+            <select id="cuisine" placeholder="Select Cuisine">
+            <option value="">-- Select Cuisine --</option>
+            <!-- Cuisine options will be populated dynamically -->
+            </select>
+
             <button onclick="searchRecipes()">Search</button>
         </div>
     </section>
@@ -59,6 +66,7 @@
     <section id="results-section">
         <h2>Recipe Suggestions</h2>
         <div id="recipes"></div>
+        <div id="pagination" style="text-align: center; margin-top: 20px;"></div> <!-- Pagination for results -->
     </section>
 
 <footer>
