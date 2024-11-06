@@ -121,16 +121,17 @@ async function searchRecipes() {
 
     const ingredients = `${ingredient1},${ingredient2},${ingredient3}`;
 
-    // Build the API request URL with cuisine parameter if selected
-    let apiUrl = `https://api.spoonacular.com/recipes/complexSearch?ingredients=${ingredients}&number=20&apiKey=${apiKey}`;
+    let apiUrl = `https://api.spoonacular.com/recipes/findByIngredients?ingredients=${ingredients}&number=20&apiKey=${apiKey}`;
+
+    // Build the API request URL with cuisine parameter if selected, add the cuisine filter if selected
     if (selectedCuisine) {
-        apiUrl += `&cuisine=${selectedCuisine}`;
+        apiUrl = `https://api.spoonacular.com/recipes/complexSearch?includeIngredients=${ingredients}&cuisine=${selectedCuisine}&number=20&apiKey=${apiKey}`;
     }
 
     const response = await fetch(apiUrl);
     const recipes = await response.json();
 
-    displayRecipes(recipes.results); // Adjust as per API response format
+    displayRecipes(recipes);
 }
 
 // Pagination variable support
