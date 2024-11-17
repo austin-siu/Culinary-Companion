@@ -72,6 +72,13 @@ signupFormBtn.onclick = function(event) {
 
     const signupEmail = document.getElementById('signup-email').value;
     const signupPassword = document.getElementById('signup-password').value;
+    const signupConfirmPassword = document.getElementById('confirmPassword').value;
+    const name = document.getElementById('name').value;
+
+    if (signupPassword !== signupConfirmPassword) {
+        alert("Password must match with re-type password");
+        return;
+    }
 
     const users = JSON.parse(localStorage.getItem('users')) || [];
 
@@ -83,6 +90,8 @@ signupFormBtn.onclick = function(event) {
         users.push({ signupEmail, signupPassword });
         localStorage.setItem('users', JSON.stringify(users));
         alert("User has been successfully registered!");
+        signupModal.style.display = 'none';
+        loginModal.style.display = 'block';
     }
 }
 
