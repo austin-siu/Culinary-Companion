@@ -168,7 +168,13 @@ async function searchRecipes() {
         }
     } catch (error) {
         console.error("Error fetching recipes:", error);
-        document.getElementById('recipes').innerHTML = `<p>Error: Unable to load recipes. Please try again later.</p>`;
+        
+        // Display specific message for network issues
+        if (error instanceof TypeError && error.message.includes("Failed to fetch")) {
+            document.getElementById('recipes').innerHTML = `<p>Unable to connect. Please check your internet connection and try again.</p>`;
+        } else {
+            document.getElementById('recipes').innerHTML = `<p>Error: Unable to load recipes. Please try again later.</p>`;
+        }
     }
 }
 
