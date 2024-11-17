@@ -128,6 +128,13 @@ async function searchRecipes() {
     const ingredient3 = document.getElementById('ingredient3').value.trim();
     const selectedCuisine = document.getElementById('cuisine').value.trim();
 
+    // Check if all ingredient fields are empty
+    if (!ingredient1 && !ingredient2 && !ingredient3) {
+        const recipeContainer = document.getElementById('recipes');
+        recipeContainer.innerHTML = "<p>Please enter at least one ingredient.</p>";
+        return; // Exit the function early
+    }
+
     // Create a cleaned list of non-empty ingredients
     const ingredients = [ingredient1, ingredient2, ingredient3].filter(Boolean).join(',');
 
