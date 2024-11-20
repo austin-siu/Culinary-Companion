@@ -3,12 +3,16 @@ const apiKey = 'eb23580ee2d64d6bad96c8e88c21646f';
 // Get the modals
 const loginModal = document.getElementById('login-modal');
 const signupModal = document.getElementById('signup-modal');
+const forgetPasswordModal = document.getElementById('change-password-modal')
 
 // Get the buttons that open the modals
 const loginBtn = document.getElementById('login');
+const logoutBtn = document.getElementById('logout');
 const signupBtn = document.getElementById('signup');
 const loginFormBtn = document.getElementById('login-form-btn');
 const signupFormBtn = document.getElementById('signup-form-btn');
+const changepasswordbtn = document.getElementById('change-password');
+const changePasswordSubmit = document.getElementById('change-password-submit-btn');
 
 let isLoggedIn = false; // Tracks if a user is logged in
 
@@ -20,6 +24,11 @@ const closeSignup = document.getElementById('close-signup');
 loginBtn.onclick = function() {
     loginModal.style.display = 'block';
 }
+
+changepasswordbtn.onclick = function(){
+    forgetPasswordModal.style.display = "block" 
+}
+
 
 // When the user clicks the signup button, open the signup modal
 signupBtn.onclick = function() {
@@ -45,6 +54,14 @@ window.onclick = function(event) {
     }
 }
 
+logoutBtn.onclick = function (event) {
+    document.getElementById('loggedInAs').innerText = '';
+    logoutBtn.style.display = 'none';
+    loginBtn.style.display = "block";
+    changepasswordbtn.style.display = 'none';
+    signupBtn.style.display ='block';
+}
+
 // Login functionality
 loginFormBtn.onclick = function(event) {
     event.preventDefault(); // Prevent form submission
@@ -61,9 +78,46 @@ loginFormBtn.onclick = function(event) {
         loginModal.style.display = 'none';
         isLoggedIn = true;
         document.getElementById('loggedInAs').innerText = `Logged in as: ${email}`;
+        logoutBtn.style.display = 'block';
+        loginBtn.style.display = 'none';
+        changepasswordbtn.style.display = 'block';
+        signupBtn.style.display ='none';
     } else {
         alert('Invalid credentials');
     }
+}
+//Change password Logic
+changePasswordSubmit.onclick = function (event){
+    event.preventDefault();
+
+    const oldpassword = document.getElementById('old-password').value;
+    const newPassword = document.getElementById('new-password').value;
+    const confirmNewPassword = document.getElementById('confirm-new-password').value;
+    const loggedInText = document.getElementById('loggedInAs').textContent;
+    const email = loggedInText.replace('Logged in as: ', '');
+
+    const users = JSON.parse(localStorage.getItem('users')) || [];
+    const user = users.find(user => user.signupEmail === email);
+
+    if (users == []) {
+        alert("No user found!");
+        return;
+    }
+    if (confirmNewPassword !== newPassword) {
+        alert("New Password must match with Confirm New Password");
+        return;
+    }
+
+    if (oldpassword !== user.signupPassword) {
+        alert("Old Password is not correct");
+        return;
+    }
+
+    user.signupPassword = newPassword;
+    
+    localStorage.setItem('users', JSON.stringify(users));
+    alert("User password has been successfully changed!");
+    forgetPasswordModal.style.display = 'none';
 }
 
 // Signup functionality
