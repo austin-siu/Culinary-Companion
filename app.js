@@ -1,11 +1,11 @@
 const apiKey = 'eb23580ee2d64d6bad96c8e88c21646f';
 
-// Get the modals
+// Modals
 const loginModal = document.getElementById('login-modal');
 const signupModal = document.getElementById('signup-modal');
-const forgetPasswordModal = document.getElementById('change-password-modal')
+const forgetPasswordModal = document.getElementById('change-password-modal');
 
-// Get the buttons that open the modals
+// Buttons
 const loginBtn = document.getElementById('login');
 const logoutBtn = document.getElementById('logout');
 const signupBtn = document.getElementById('signup');
@@ -14,123 +14,86 @@ const signupFormBtn = document.getElementById('signup-form-btn');
 const changepasswordbtn = document.getElementById('change-password');
 const changePasswordSubmit = document.getElementById('change-password-submit-btn');
 
-let isLoggedIn = false; // Tracks if a user is logged in
-
-// Get the close buttons
+// Close Buttons
 const closeLogin = document.getElementById('close-login');
 const closeSignup = document.getElementById('close-signup');
-const closeforgetPassword = document.getElementById('change-password');
+const closeChangePassword = document.getElementById('close-signup'); // Fix mismatch
 
-// When the user clicks the login button, open the login modal
-loginBtn.onclick = function() {
-    loginModal.style.display = 'block';
+// Tracks login state
+let isLoggedIn = JSON.parse(localStorage.getItem('isLoggedIn')) || false;
+const loggedInUser = localStorage.getItem('loggedInUser') || '';
+
+// Update UI based on login state
+function updateUIAfterLogin(email) {
+    document.getElementById('loggedInAs').innerText = `Logged in as: ${email}`;
+    logoutBtn.style.display = 'block';
+    loginBtn.style.display = 'none';
+    changepasswordbtn.style.display = 'block';
+    signupBtn.style.display = 'none';
 }
 
-changepasswordbtn.onclick = function(){
-    forgetPasswordModal.style.display = "block" 
-}
-
-
-// When the user clicks the signup button, open the signup modal
-signupBtn.onclick = function() {
-    signupModal.style.display = 'block';
-}
-
-// When the user clicks on (x), close the modals
-closeLogin.onclick = function() {
-    loginModal.style.display = 'none';
-}
-
-closeSignup.onclick = function() {
-    signupModal.style.display = 'none';
-}
-
-closeChangePassword.onclick = function(){
-    forgetPasswordModal.style.display = 'none';
-}
-
-// Close the modal when the user clicks anywhere outside of the modal
-window.onclick = function(event) {
-    if (event.target === loginModal) {
-        loginModal.style.display = 'none';
-    }
-    if (event.target === signupModal) {
-        signupModal.style.display = 'none';
-    }
-    if (event.target === forgetPasswordModal) {
-        forgetpasswordModal.style.display = 'none';
-    }
-}
-
-logoutBtn.onclick = function (event) {
+function updateUIAfterLogout() {
     document.getElementById('loggedInAs').innerText = '';
     logoutBtn.style.display = 'none';
-    loginBtn.style.display = "block";
+    loginBtn.style.display = 'block';
     changepasswordbtn.style.display = 'none';
-    signupBtn.style.display ='block';
+    signupBtn.style.display = 'block';
 }
 
+// Initialize UI
+if (isLoggedIn && loggedInUser) {
+    updateUIAfterLogin(loggedInUser);
+}
+
+// Open modals
+loginBtn.onclick = () => (loginModal.style.display = 'block');
+signupBtn.onclick = () => (signupModal.style.display = 'block');
+changepasswordbtn.onclick = () => (forgetPasswordModal.style.display = 'block');
+
+// Close modals
+closeLogin.onclick = () => (loginModal.style.display = 'none');
+closeSignup.onclick = () => (signupModal.style.display = 'none');
+closeChangePassword.onclick = () => (forgetPasswordModal.style.display = 'none');
+
+// Close modals when clicking outside
+window.onclick = (event) => {
+    if (event.target === loginModal) loginModal.style.display = 'none';
+    if (event.target === signupModal) signupModal.style.display = 'none';
+    if (event.target === forgetPasswordModal) forgetPasswordModal.style.display = 'none';
+};
+
+// Logout functionality
+logoutBtn.onclick = () => {
+    localStorage.removeItem('isLoggedIn');
+    localStorage.removeItem('loggedInUser');
+    updateUIAfterLogout();
+};
+
 // Login functionality
-loginFormBtn.onclick = function(event) {
-    event.preventDefault(); // Prevent form submission
+loginFormBtn.onclick = (event) => {
+    event.preventDefault();
 
     const email = document.getElementById('login-email').value;
     const password = document.getElementById('login-password').value;
 
     const users = JSON.parse(localStorage.getItem('users')) || [];
 
-    // Check if user exists
-    const user = users.find(user => user.signupEmail === email && user.signupPassword === password);
+    const user = users.find((user) => user.signupEmail === email && user.signupPassword === password);
     if (user) {
         alert(`${email} is successfully logged in`);
-        loginModal.style.display = 'none';
         isLoggedIn = true;
-        document.getElementById('loggedInAs').innerText = `Logged in as: ${email}`;
-        logoutBtn.style.display = 'block';
-        loginBtn.style.display = 'none';
-        changepasswordbtn.style.display = 'block';
-        signupBtn.style.display ='none';
+        localStorage.setItem('isLoggedIn', true);
+        localStorage.setItem('loggedInUser', email);
+        loginModal.style.display = 'none';
+        updateUIAfterLogin(email);
     } else {
         alert('Invalid credentials');
     }
-}
-//Change password Logic
-changePasswordSubmit.onclick = function (event){
-    event.preventDefault();
-
-    const oldpassword = document.getElementById('old-password').value;
-    const newPassword = document.getElementById('new-password').value;
-    const confirmNewPassword = document.getElementById('confirm-new-password').value;
-    const loggedInText = document.getElementById('loggedInAs').textContent;
-    const email = loggedInText.replace('Logged in as: ', '');
-
-    const users = JSON.parse(localStorage.getItem('users')) || [];
-    const user = users.find(user => user.signupEmail === email);
-
-    if (users == []) {
-        alert("No user found!");
-        return;
-    }
-    if (confirmNewPassword !== newPassword) {
-        alert("New Password must match with Confirm New Password");
-        return;
-    }
-
-    if (oldpassword !== user.signupPassword) {
-        alert("Old Password is not correct");
-        return;
-    }
-
-    user.signupPassword = newPassword;
-    
-    localStorage.setItem('users', JSON.stringify(users));
-    alert("User password has been successfully changed!");
-    forgetPasswordModal.style.display = 'none';
-}
+};
 
 // Signup functionality
-signupFormBtn.onclick = function(event) {
-    event.preventDefault(); // Prevent form submission
+signupFormBtn.onclick = (event) => {
+    event.preventDefault();
 
     const signupEmail = document.getElementById('signup-email').value;
     const signupPassword = document.getElementById('signup-password').value;
@@ -144,29 +107,59 @@ signupFormBtn.onclick = function(event) {
 
     const users = JSON.parse(localStorage.getItem('users')) || [];
 
-    // Check if user already exists
-    if (users.some(user => user.signupEmail === signupEmail)) {
+    if (users.some((user) => user.signupEmail === signupEmail)) {
         alert("User already exists");
     } else {
-        // Save new user
-        users.push({ signupEmail, signupPassword });
+        users.push({ signupEmail, signupPassword, name });
         localStorage.setItem('users', JSON.stringify(users));
         alert("User has been successfully registered!");
         signupModal.style.display = 'none';
+        document.getElementById('signup-form').reset(); // Reset form
         loginModal.style.display = 'block';
     }
-}
+};
 
-// Fetch available cuisines and populate dropdown
+// Change password functionality
+changePasswordSubmit.onclick = (event) => {
+    event.preventDefault();
+
+    const oldPassword = document.getElementById('old-password').value;
+    const newPassword = document.getElementById('new-password').value;
+    const confirmNewPassword = document.getElementById('confirm-new-password').value;
+    const email = localStorage.getItem('loggedInUser');
+
+    const users = JSON.parse(localStorage.getItem('users')) || [];
+    const user = users.find((user) => user.signupEmail === email);
+
+    if (!user) {
+        alert("No user found!");
+        return;
+    }
+
+    if (newPassword !== confirmNewPassword) {
+        alert("New Password must match with Confirm New Password");
+        return;
+    }
+
+    if (oldPassword !== user.signupPassword) {
+        alert("Old Password is not correct");
+        return;
+    }
+
+    user.signupPassword = newPassword;
+    localStorage.setItem('users', JSON.stringify(users));
+    alert("Password successfully changed!");
+    forgetPasswordModal.style.display = 'none';
+};
+
+// Populate cuisines
 async function populateCuisineDropdown() {
     const cuisineDropdown = document.getElementById('cuisine');
-
     if (!cuisineDropdown) {
         console.error("Cuisine dropdown element not found!");
         return;
     }
 
-    // Cuisines offered by Spoonacular API
     const cuisines = [
         "African", "American", "British", "Cajun", "Caribbean", "Chinese", "Eastern European",
         "European", "French", "German", "Greek", "Indian", "Irish", "Italian", "Japanese",
@@ -182,27 +175,22 @@ async function populateCuisineDropdown() {
     });
 }
 
-
-// Recipe search and display functions
+// Search recipes
 async function searchRecipes() {
     const ingredient1 = document.getElementById('ingredient1').value.trim();
     const ingredient2 = document.getElementById('ingredient2').value.trim();
     const ingredient3 = document.getElementById('ingredient3').value.trim();
     const selectedCuisine = document.getElementById('cuisine').value.trim();
 
-    // Check if all ingredient fields are empty
     if (!ingredient1 && !ingredient2 && !ingredient3) {
         const recipeContainer = document.getElementById('recipes');
         recipeContainer.innerHTML = "<p>Please enter at least one ingredient.</p>";
-        return; // Exit the function early
+        return;
     }
 
-    // Create a cleaned list of non-empty ingredients
     const ingredients = [ingredient1, ingredient2, ingredient3].filter(Boolean).join(',');
-
     let apiUrl;
 
-    // Use complexSearch if a cuisine is selected; otherwise, use findByIngredients
     if (selectedCuisine && selectedCuisine !== "Select Cuisine") {
         apiUrl = `https://api.spoonacular.com/recipes/complexSearch?includeIngredients=${ingredients}&cuisine=${selectedCuisine}&number=20&apiKey=${apiKey}`;
     } else {
@@ -210,19 +198,10 @@ async function searchRecipes() {
     }
 
     try {
-        // Log the API URL to inspect
-        console.log("API URL:", apiUrl);
-
         const response = await fetch(apiUrl);
         const data = await response.json();
-
-        // Check if the API response contains `results` (for complexSearch) or is a direct array (for findByIngredients)
         const recipes = data.results || data;
 
-        // Log the data to inspect the structure and see if there are any error messages
-        console.log("API Response Data:", data);
-
-        // Display recipes or show an error if no valid recipes are returned
         if (recipes && recipes.length > 0) {
             displayRecipes(recipes);
         } else {
@@ -230,16 +209,9 @@ async function searchRecipes() {
         }
     } catch (error) {
         console.error("Error fetching recipes:", error);
-        
-        // Display specific message for network issues
-        if (error instanceof TypeError && error.message.includes("Failed to fetch")) {
-            document.getElementById('recipes').innerHTML = `<p>Unable to connect. Please check your internet connection and try again.</p>`;
-        } else {
-            document.getElementById('recipes').innerHTML = `<p>Error: Unable to load recipes. Please try again later.</p>`;
-        }
+        document.getElementById('recipes').innerHTML = `<p>Error: Unable to load recipes. Please try again later.</p>`;
     }
 }
-
 
 // Pagination variable support
 let currentPage = 1;
@@ -305,8 +277,7 @@ function displayPaginationControls() {
     }
 }
 
-
-// Fetch and display detailed recipe information on the recipe page
+// Fetch recipe details
 async function fetchRecipeDetails() {
     try {
         const urlParams = new URLSearchParams(window.location.search);
@@ -318,44 +289,27 @@ async function fetchRecipeDetails() {
         }
 
         const response = await fetch(`https://api.spoonacular.com/recipes/${recipeId}/information?includeNutrition=true&apiKey=${apiKey}`);
+        const recipe = await response.json();
 
         if (response.ok) {
-            const recipe = await response.json();
-            displayRecipeDetails(recipe);
+            const recipeDetailsSection = document.getElementById('recipe-details');
+            recipeDetailsSection.innerHTML = `
+                <h2>${recipe.title}</h2>
+                <img src="${recipe.image}" alt="${recipe.title}">
+                <p><strong>Servings:</strong> ${recipe.servings}</p>
+                <p><strong>Preparation time:</strong> ${recipe.readyInMinutes} minutes</p>
+            `;
         } else {
             console.error("Failed to fetch recipe data:", response.status);
-            document.getElementById('recipe-details').innerHTML = `<p>Error: Unable to load recipe details (status: ${response.status})</p>`;
         }
     } catch (error) {
         console.error("Error fetching recipe:", error);
-        document.getElementById('recipe-details').innerHTML = `<p>Error: Unable to load recipe details. Please try again later.</p>`;
     }
 }
 
-function displayRecipeDetails(recipe) {
-    const recipeDetailsSection = document.getElementById('recipe-details');
-
-    if (!recipeDetailsSection) {
-        console.error("Recipe details section not found in HTML");
-        return;
-    }
-
-    recipeDetailsSection.innerHTML = `
-        <h2>${recipe.title}</h2>
-        <img src="${recipe.image}" alt="${recipe.title}">
-        <p><strong>Servings:</strong> ${recipe.servings}</p>
-        <p><strong>Preparation time:</strong> ${recipe.readyInMinutes} minutes</p>
-        <h3>Ingredients</h3>
-        <ul>
-            ${recipe.extendedIngredients.map(ingredient => `<li>${ingredient.original}</li>`).join('')}
-        </ul>
-        <h3>Instructions</h3>
-        <p>${recipe.instructions || "No instructions available"}</p>
-    `;
-}
-
-// Call the functions to fetch recipe details and populate the cuisine dropdown after the DOM has loaded
-document.addEventListener("DOMContentLoaded", function() {
+// Cuisine dropdown population
+document.addEventListener("DOMContentLoaded", () => {
     fetchRecipeDetails();
     populateCuisineDropdown();
+    if (isLoggedIn && loggedInUser) updateUIAfterLogin(loggedInUser);
 });
