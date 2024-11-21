@@ -59,6 +59,7 @@ window.onclick = function(event) {
     }
     if (event.target === forgetPasswordModel) {
         forgetpasswordModal.style.display = 'none';
+    }
 }
 
 logoutBtn.onclick = function (event) {
