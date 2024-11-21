@@ -19,6 +19,7 @@ let isLoggedIn = false; // Tracks if a user is logged in
 // Get the close buttons
 const closeLogin = document.getElementById('close-login');
 const closeSignup = document.getElementById('close-signup');
+const closeforgetPassword = document.getElementById('change-password');
 
 // When the user clicks the login button, open the login modal
 loginBtn.onclick = function() {
@@ -44,6 +45,10 @@ closeSignup.onclick = function() {
     signupModal.style.display = 'none';
 }
 
+closeChangePassword.onclick = function(){
+    forgetPasswordModal.style.display = 'none';
+}
+
 // Close the modal when the user clicks anywhere outside of the modal
 window.onclick = function(event) {
     if (event.target === loginModal) {
@@ -52,6 +57,8 @@ window.onclick = function(event) {
     if (event.target === signupModal) {
         signupModal.style.display = 'none';
     }
+    if (event.target === forgetPasswordModel) {
+        forgetpasswordModal.style.display = 'none';
 }
 
 logoutBtn.onclick = function (event) {
