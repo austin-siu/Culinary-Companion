@@ -57,7 +57,7 @@ window.onclick = function(event) {
     if (event.target === signupModal) {
         signupModal.style.display = 'none';
     }
-    if (event.target === forgetPasswordModel) {
+    if (event.target === forgetPasswordModal) {
         forgetpasswordModal.style.display = 'none';
     }
 }
