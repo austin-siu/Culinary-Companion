@@ -31,3 +31,19 @@ Culinary Companion is a web application that helps users discover recipes based 
 ## Future Enhancements
 - **User Profiles**: Allow users to save favorite recipes and track their cooking history.
 - **Restaurant Finder**: Integrate with an API to help users find nearby restaurants based on ingredients.
+
+## Installation
+
+1. **Clone the repository**:
+   git clone https://github.com/austin-siu/culinary-companion.git
+
+2. **Navigate to the project directory**:
+   cd culinary-companion
+
+3. **Install dependencies**:
+   npm install
+
+4. **Start the development server**:
+   npm start
+
+5. Open your browser and visit http://localhost:8080 to view the app.
